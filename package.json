@@ -1,0 +1,15 @@
+{
+    "name": "data-table-modal",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "node bin/build.js",
+        "dev": "node bin/build.js --dev"
+    },
+    "devDependencies": {
+        "esbuild": "^0.24.0"
+    },
+    "dependencies": {
+        "sortablejs": "^1.15.0"
+    }
+}

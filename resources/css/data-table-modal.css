@@ -1,0 +1,13 @@
+/*
+ * Optional styles for the Data Table with Modal field. The table markup uses
+ * Tailwind utility classes and Filament's primary/danger CSS variables, so it
+ * themes automatically. These rules only cover drag-and-drop affordances.
+ */
+[data-dtm-sortable] .dtm-drag-handle {
+    user-select: none;
+    line-height: 1;
+}
+
+[data-dtm-sortable] tr.sortable-chosen {
+    background-color: rgba(0, 0, 0, 0.04);
+}
