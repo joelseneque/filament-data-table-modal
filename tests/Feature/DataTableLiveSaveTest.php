@@ -24,6 +24,14 @@ it('accepts a custom host method for live save', function () {
     expect($field->getLiveSaveMethod())->toBe('create');
 });
 
+it('accepts a closure condition for live save', function () {
+    $on = DataTable::make('items')->arrayState()->liveSave(fn (): bool => true);
+    $off = DataTable::make('items')->arrayState()->liveSave(fn (): bool => false);
+
+    expect($on->shouldLiveSave())->toBeTrue();
+    expect($off->shouldLiveSave())->toBeFalse();
+});
+
 it('never live saves eloquent-backed tables', function () {
     $field = DataTable::make('items')->records(stdClass::class);
 

@@ -94,9 +94,9 @@ class DataTable extends Field
 
     protected bool $persistImmediately = true;
 
-    protected ?bool $liveSaveOverride = null;
+    protected bool|Closure|null $liveSaveOverride = null;
 
-    protected string $liveSaveMethod = 'save';
+    protected string|Closure $liveSaveMethod = 'save';
 
     protected ?Closure $recordClasses = null;
 
@@ -345,7 +345,7 @@ class DataTable extends Field
      * of the host page. Array-state only; the parent Livewire method named here
      * is invoked after the synced state is committed.
      */
-    public function liveSave(bool $condition = true, string $method = 'save'): static
+    public function liveSave(bool|Closure $condition = true, string|Closure $method = 'save'): static
     {
         $this->liveSaveOverride = $condition;
         $this->liveSaveMethod = $method;
@@ -353,9 +353,9 @@ class DataTable extends Field
         return $this;
     }
 
-    public function disableLiveSave(): static
+    public function disableLiveSave(bool $condition = true): static
     {
-        $this->liveSaveOverride = false;
+        $this->liveSaveOverride = ! $condition;
 
         return $this;
     }
@@ -370,12 +370,14 @@ class DataTable extends Field
             return false;
         }
 
-        return $this->liveSaveOverride ?? (bool) config('data-table-modal.live_save', true);
+        $resolved = $this->evaluate($this->liveSaveOverride);
+
+        return $resolved ?? (bool) config('data-table-modal.live_save', true);
     }
 
     public function getLiveSaveMethod(): string
     {
-        return $this->liveSaveMethod;
+        return (string) $this->evaluate($this->liveSaveMethod);
     }
 
     public function recordClasses(Closure $callback): static

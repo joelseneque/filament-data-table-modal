@@ -195,12 +195,16 @@ once the synced state has been applied.
 DataTable::make('sections')->arrayState()        // live save is on by default
 DataTable::make('sections')->arrayState()->disableLiveSave()   // require a page save
 DataTable::make('sections')->arrayState()->liveSave(method: 'create') // e.g. a create page
+
+// Edit-only: the condition and method accept closures (Filament injects $operation)
+DataTable::make('sections')->arrayState()
+    ->liveSave(fn (string $operation): bool => $operation === 'edit')
 ```
 
 Live save only applies to array-state tables — Eloquent-backed rows already persist
 through their data source. Set the global default with the `live_save` config key.
-On a **create** page there is no record yet, so either use `disableLiveSave()` or
-point `liveSave(method: ...)` at the host method that persists a new record.
+On a **create** page there is no record yet and the host method is `create`, not
+`save` — so gate live save to `edit` (as above) or `disableLiveSave()` there.
 
 ## Notes on closures
 
