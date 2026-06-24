@@ -1,6 +1,7 @@
 @php
     $statePath = $getStatePath();
     $mountData = $getMountData();
+    $config = $mountData['config'] ?? [];
     $wireId = $this->getId();
 @endphp
 
@@ -19,6 +20,11 @@
             const component = Livewire.find(@js($wireId));
             if (! component) return;
             component.set(@js($statePath), $event.detail.items ?? []);
+            @if ($config['liveSave'] ?? false)
+                // Pooled into the same request as the set above, so the host
+                // method runs with the freshly-synced state already applied.
+                component.call(@js($config['liveSaveMethod'] ?? 'save'));
+            @endif
         "
     >
         @livewire(

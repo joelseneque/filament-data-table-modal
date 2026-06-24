@@ -94,6 +94,10 @@ class DataTable extends Field
 
     protected bool $persistImmediately = true;
 
+    protected ?bool $liveSaveOverride = null;
+
+    protected string $liveSaveMethod = 'save';
+
     protected ?Closure $recordClasses = null;
 
     // Lifecycle hooks
@@ -335,6 +339,45 @@ class DataTable extends Field
         return $this;
     }
 
+    /**
+     * Persist the parent form as soon as a row is saved in the modal (or any
+     * other table mutation) so the change is committed without a separate save
+     * of the host page. Array-state only; the parent Livewire method named here
+     * is invoked after the synced state is committed.
+     */
+    public function liveSave(bool $condition = true, string $method = 'save'): static
+    {
+        $this->liveSaveOverride = $condition;
+        $this->liveSaveMethod = $method;
+
+        return $this;
+    }
+
+    public function disableLiveSave(): static
+    {
+        $this->liveSaveOverride = false;
+
+        return $this;
+    }
+
+    /**
+     * Live save is meaningful only in array-state mode (Eloquent rows already
+     * persist via their data source) and defaults to on.
+     */
+    public function shouldLiveSave(): bool
+    {
+        if (! $this->arrayState) {
+            return false;
+        }
+
+        return $this->liveSaveOverride ?? (bool) config('data-table-modal.live_save', true);
+    }
+
+    public function getLiveSaveMethod(): string
+    {
+        return $this->liveSaveMethod;
+    }
+
     public function recordClasses(Closure $callback): static
     {
         $this->recordClasses = $callback;
@@ -505,6 +548,8 @@ class DataTable extends Field
             'paginate' => $this->paginate,
             'confirmDelete' => $this->confirmDeleteOverride ?? (bool) config('data-table-modal.confirm_delete', true),
             'persistImmediately' => $this->persistImmediately,
+            'liveSave' => $this->shouldLiveSave(),
+            'liveSaveMethod' => $this->liveSaveMethod,
             'disabled' => $this->isDisabled(),
             'recordClasses' => $this->recordClasses !== null
                 ? serialize(new SerializableClosure($this->recordClasses))

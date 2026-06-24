@@ -171,6 +171,8 @@ The named fields (`subtotal`, `gst_amount`, …) must exist in the surrounding f
 ->paginate(25)
 ->confirmDelete()
 ->persistImmediately(false)                         // model-backed but deferred saving
+->disableLiveSave()                                 // array-state: don't auto-save the host form
+->liveSave(method: 'create')                        // array-state: call a different host method
 ->recordClasses(fn ($row) => $row->isSummary() ? 'font-semibold' : '')
 ->afterRowCreated(fn ($row, $source) => /* … */)
 ->afterRowUpdated(fn ($row, $source) => /* … */)
@@ -180,6 +182,25 @@ The named fields (`subtotal`, `gst_amount`, …) must exist in the surrounding f
 
 `disabled()` / `readonly()` inherited from `Field` are respected — the table hides
 add/edit/delete/reorder and inline editing.
+
+### Live save (array state)
+
+In array-state mode every mutation (a row saved in the modal, reordered, deleted,
+inline-edited, …) syncs into the host form's state. By default the host form is
+then **persisted immediately** — saving a row in the modal commits it without a
+separate save of the page. This calls the host Livewire component's `save` method
+once the synced state has been applied.
+
+```php
+DataTable::make('sections')->arrayState()        // live save is on by default
+DataTable::make('sections')->arrayState()->disableLiveSave()   // require a page save
+DataTable::make('sections')->arrayState()->liveSave(method: 'create') // e.g. a create page
+```
+
+Live save only applies to array-state tables — Eloquent-backed rows already persist
+through their data source. Set the global default with the `live_save` config key.
+On a **create** page there is no record yet, so either use `disableLiveSave()` or
+point `liveSave(method: ...)` at the host method that persists a new record.
 
 ## Notes on closures
 
