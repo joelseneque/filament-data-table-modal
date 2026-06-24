@@ -19,17 +19,9 @@
         <x-filament::loading-indicator class="h-8 w-8 text-primary-600" />
     </div>
 
-    {{--
-        Not a <form> element on purpose: this modal renders inline inside the
-        host page's own <form>, and nested forms are invalid HTML — the inner
-        </form> closes the outer one early, leaving the host's submit button
-        outside the form so its save does nothing. The "Update/Add" button below
-        submits via wire:click="save"; Enter-to-submit is preserved here for
-        single-line inputs (textareas keep their newline behaviour).
-    --}}
-    <div x-on:keydown.enter="if (! $event.target.matches('textarea')) { $event.preventDefault(); $wire.save() }">
+    <form wire:submit.prevent="save">
         {{ $this->form }}
-    </div>
+    </form>
 </div>
 
 <div class="flex items-center justify-end gap-3 border-t border-gray-200 dark:border-gray-700 px-6 py-4 bg-gray-50 dark:bg-gray-900">

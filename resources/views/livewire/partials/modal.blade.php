@@ -10,7 +10,17 @@
     (set optimistically on the open buttons) — the Livewire round trip then fills
     the form. `panelOpen` lives in the component root's x-data and is kept in sync
     with the server `modalOpen` via x-effect, so closing is authoritative.
+
+    Teleported to <body> so the modal's <form> and its `required` controls live
+    OUTSIDE the host page's own <form>. Nested forms are invalid HTML (the inner
+    </form> closes the outer one early, breaking the host's submit button), and a
+    hidden required control inside the host form blocks native submit validation
+    ("invalid form control is not focusable"). The <template> is also inert at
+    parse time, so the wrapping alone prevents the form-nesting breakage; the
+    teleport then keeps it clear of the host form at runtime. `panelOpen`/`$wire`
+    scope is preserved by x-teleport.
 --}}
+<template x-teleport="body">
 <div x-show="panelOpen" x-cloak class="fixed inset-0 z-50 overflow-hidden" style="display: none;">
     {{-- Backdrop --}}
     <div
@@ -60,3 +70,4 @@
         </div>
     @endif
 </div>
+</template>
