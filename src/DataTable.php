@@ -258,6 +258,12 @@ class DataTable extends Field
         return $this;
     }
 
+    /**
+     * The modal/slide-over heading. Pass a string for a fixed heading, or a
+     * Closure to compute it per row — it receives the editing {@see Row} (null
+     * when creating) and the row's 1-based position, e.g.
+     * `fn ($row, int $number) => "Unit {$number}"`.
+     */
     public function modalHeading(string|Closure|null $heading): static
     {
         $this->modalHeading = $heading;
@@ -539,6 +545,9 @@ class DataTable extends Field
             'slideOver' => $this->slideOver,
             'modalWidth' => $this->modalWidth instanceof ModalWidth ? $this->modalWidth->value : $this->modalWidth,
             'modalHeading' => is_string($this->modalHeading) ? $this->modalHeading : null,
+            'modalHeadingResolver' => $this->modalHeading instanceof Closure
+                ? serialize(new SerializableClosure($this->modalHeading))
+                : null,
             'emptyStateHeading' => is_string($this->emptyStateHeading) ? $this->emptyStateHeading : null,
             'emptyStateIcon' => is_string($this->emptyStateIcon) ? $this->emptyStateIcon : null,
             'minItems' => $this->evaluate($this->minItems),

@@ -487,6 +487,29 @@ class DataTableManager extends Component implements HasActions, HasForms
         return (array) $default;
     }
 
+    /**
+     * The heading shown in the modal header. A configured Closure is resolved
+     * against the row being edited (null when creating) and its 1-based
+     * position, so headings like "Unit 3" can track the row. Falls back to the
+     * static string heading, or null so the view shows its Add/Edit default.
+     */
+    public function modalHeadingText(): ?string
+    {
+        $resolver = $this->config['modalHeadingResolver'] ?? null;
+
+        if ($resolver !== null) {
+            $row = $this->editingRowId !== null
+                ? $this->makeSource()->find($this->editingRowId)
+                : null;
+
+            $position = $row !== null ? $row->order + 1 : count($this->rows) + 1;
+
+            return (string) unserialize($resolver)->getClosure()($row, $position);
+        }
+
+        return $this->config['modalHeading'] ?? null;
+    }
+
     protected function columnIsInlineEditable(string $field): bool
     {
         return collect($this->columns)->contains(

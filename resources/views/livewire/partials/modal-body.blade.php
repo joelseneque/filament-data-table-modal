@@ -1,7 +1,7 @@
 <div class="bg-primary-600 dark:bg-primary-700 px-6 py-5">
     <div class="flex items-center justify-between">
         <h2 class="text-lg font-semibold text-white">
-            {{ $heading ?? ($editingRowId ? 'Edit' : 'Add') }}
+            {{ $this->modalHeadingText() ?? ($editingRowId ? 'Edit' : 'Add') }}
         </h2>
         <button type="button" wire:click="closeModal" x-on:click="panelOpen = false" class="text-primary-100 hover:text-white">
             <span class="text-xl leading-none">&times;</span>

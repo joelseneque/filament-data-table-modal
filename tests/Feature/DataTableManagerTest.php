@@ -112,6 +112,35 @@ it('deletes a row', function () {
         ->assertCount('items', 0);
 });
 
+it('resolves a closure modal heading against the row position', function () {
+    $mount = mountData([
+        ['name' => 'A', 'qty' => 1],
+        ['name' => 'B', 'qty' => 2],
+    ]);
+    $mount['config']['modalHeadingResolver'] = serialize(new SerializableClosure(
+        fn ($row, int $number): string => "Unit {$number}"
+    ));
+
+    $component = Livewire::test(DataTableManager::class, $mount);
+
+    // Creating: heading reflects the next position (count + 1).
+    expect($component->instance()->modalHeadingText())->toBe('Unit 3');
+
+    // Editing the second row: heading reflects its 1-based position.
+    $secondId = $component->get('items')[1]['__id'];
+    $component->call('openEditModal', $secondId);
+
+    expect($component->instance()->modalHeadingText())->toBe('Unit 2');
+});
+
+it('falls back to the static string modal heading', function () {
+    $mount = mountData();
+    $mount['config']['modalHeading'] = 'Line item';
+
+    expect(Livewire::test(DataTableManager::class, $mount)->instance()->modalHeadingText())
+        ->toBe('Line item');
+});
+
 it('reorders rows with move down', function () {
     $component = Livewire::test(DataTableManager::class, mountData());
 
