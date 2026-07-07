@@ -70,11 +70,20 @@ npm install && npm run build
 
 The field uses Tailwind utility classes and Filament's `primary`/`danger` CSS
 variables, so it themes with your panel automatically. If you use a custom theme,
-add the package views to your theme's `@source` globs:
+import the package's plugin stylesheet once in your theme's CSS (after the
+Filament theme import):
 
 ```css
-@source '../../../../vendor/joelseneque/data-table-modal/resources/views/**/*.blade.php';
+@import '../../../../vendor/joelseneque/data-table-modal/resources/css/plugin.css';
 ```
+
+That single import is all you need — it scans the package's Blade views for
+utility classes, force-generates the classes that are built at runtime (the
+modal builds its width as `'max-w-' . $width`, which the Tailwind scanner can
+never see as a literal), and pulls in the drag-and-drop styles. **Don't** add a
+bare `@source '…/resources/views'` glob instead: it will miss the dynamic
+`max-w-*` widths, so `->modalWidth()` silently has no effect. After changing your
+theme CSS, rebuild it (e.g. `npm run build`).
 
 ## Data modes
 

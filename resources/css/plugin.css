@@ -1,0 +1,30 @@
+/*
+ | Data Table Modal — Tailwind v4 plugin entry point.
+ |
+ | Import this ONCE from your Filament panel theme's CSS (after the Filament
+ | theme import), e.g.:
+ |
+ |   @import '../../../../vendor/joelseneque/data-table-modal/resources/css/plugin.css';
+ |
+ | It (1) scans this package's Blade views for utility classes, (2) force-generates
+ | the classes that are assembled at runtime — so Tailwind's scanner can never see
+ | them as literals — and (3) pulls in the drag-and-drop styles. With this single
+ | import you do not need to add any `@source` lines for the package yourself.
+ */
+
+/* (3) Runtime-only styles: drag handles + sortable row states. */
+@import './data-table-modal.css';
+
+/* (1) Let Tailwind discover the utility classes used in this package's markup
+       (column alignment `text-left/center/right`, spacing, etc.). Resolved
+       relative to this file. */
+@source '../views/**/*.blade.php';
+
+/*
+ | (2) The modal partial builds its width class by concatenation
+ |     (`'max-w-' . $width` for every ModalWidth case), so `max-w-lg`, `max-w-2xl`,
+ |     … never appear as complete literals for the scanner to find. Force-generate
+ |     the full ModalWidth range. `max-w-full` (the `Screen` case) is already a
+ |     literal in the markup, so it is covered by the scan above.
+ */
+@source inline('max-w-{sm,md,lg,xl,2xl,3xl,4xl,5xl,6xl,7xl}');

@@ -45,6 +45,19 @@ closures (column callbacks, action handlers, footer where/custom, lifecycle hook
 - Use `->tableColumns([...])` — NOT `->columns()` (collides with the grid
   column-count method on every Filament component).
 
+## Tailwind (custom themes)
+Consuming apps with a custom Filament theme must `@import` the plugin stylesheet
+once, after the Filament theme import:
+`@import '.../vendor/joelseneque/data-table-modal/resources/css/plugin.css';`.
+`resources/css/plugin.css` scans the package views (`@source '../views/**/*.blade.php'`),
+imports the drag-drop styles (`data-table-modal.css`), and — critically —
+`@source inline('max-w-{sm,md,lg,…,7xl}')`. The modal partial builds its width as
+`'max-w-' . $width`, so the scanner never sees those classes as literals; without
+the inline safelist `->modalWidth()` silently does nothing. A bare
+`@source '…/resources/views'` glob is NOT enough — keep the import. If you add a
+new runtime-concatenated utility class anywhere in the Blade, add it to the
+`@source inline(...)` list too.
+
 ## Minimal usage
 ```php
 DataTable::make('items')
