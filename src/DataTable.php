@@ -72,6 +72,8 @@ class DataTable extends Field
 
     protected string|Closure|null $modalHeading = null;
 
+    protected string|Closure|null $modalHeadingField = null;
+
     // Footer
     protected Footer|Closure|null $footer = null;
 
@@ -267,6 +269,19 @@ class DataTable extends Field
     public function modalHeading(string|Closure|null $heading): static
     {
         $this->modalHeading = $heading;
+
+        return $this;
+    }
+
+    /**
+     * Bind the modal heading to a modal-form field so it live-updates in the
+     * browser as that field is typed, falling back to the resolved heading
+     * (see {@see modalHeading()}) whenever the field is empty. The bound field
+     * should be `->live()` for the heading to track keystrokes immediately.
+     */
+    public function modalHeadingField(string|Closure|null $field): static
+    {
+        $this->modalHeadingField = $field;
 
         return $this;
     }
@@ -548,6 +563,7 @@ class DataTable extends Field
             'modalHeadingResolver' => $this->modalHeading instanceof Closure
                 ? serialize(new SerializableClosure($this->modalHeading))
                 : null,
+            'modalHeadingField' => $this->evaluate($this->modalHeadingField),
             'emptyStateHeading' => is_string($this->emptyStateHeading) ? $this->emptyStateHeading : null,
             'emptyStateIcon' => is_string($this->emptyStateIcon) ? $this->emptyStateIcon : null,
             'minItems' => $this->evaluate($this->minItems),
