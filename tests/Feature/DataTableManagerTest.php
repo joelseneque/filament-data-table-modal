@@ -52,6 +52,32 @@ it('renders the manager component', function () {
         ->assertOk();
 });
 
+it('applies a modal field default when opening the create modal', function () {
+    $mount = mountData();
+    $mount['modalSchema'] = serialize(new SerializableClosure(fn () => [
+        TextInput::make('name'),
+        TextInput::make('qty')->numeric()->default(12),
+    ]));
+
+    Livewire::test(DataTableManager::class, $mount)
+        ->call('openCreateModal')
+        ->assertSet('data.qty', 12);
+});
+
+it('overlays defaultRow attributes over component defaults on create', function () {
+    $mount = mountData();
+    $mount['modalSchema'] = serialize(new SerializableClosure(fn () => [
+        TextInput::make('name')->default('Unnamed'),
+        TextInput::make('qty')->numeric()->default(12),
+    ]));
+    $mount['config']['defaultRow'] = ['qty' => 5];
+
+    Livewire::test(DataTableManager::class, $mount)
+        ->call('openCreateModal')
+        ->assertSet('data.name', 'Unnamed') // component default kept
+        ->assertSet('data.qty', 5);         // defaultRow overrides it
+});
+
 it('creates a row through the modal and syncs array state', function () {
     Livewire::test(DataTableManager::class, mountData())
         ->call('openCreateModal')

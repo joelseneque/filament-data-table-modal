@@ -210,7 +210,18 @@ class DataTableManager extends Component implements HasActions, HasForms
         }
 
         $this->editingRowId = null;
-        $this->form->fill($this->defaultRowAttributes());
+
+        // Apply the schema's component ->default() values first (fill() with no
+        // argument), then overlay any ->defaultRow() attributes on top. Filling
+        // with an array alone would skip the field defaults entirely.
+        $this->form->fill();
+
+        $defaults = $this->defaultRowAttributes();
+
+        if ($defaults !== []) {
+            $this->form->fill([...$this->data, ...$defaults]);
+        }
+
         $this->modalOpen = true;
     }
 
